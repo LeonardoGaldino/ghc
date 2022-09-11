@@ -24,6 +24,10 @@
 #define MSR_PKG_PERF_STATUS      0x613
 #define MSR_PKG_POWER_INFO       0x614
 
+/* DRAM RAPL Domain */
+#define MSR_DRAM_ENERGY_STATUS   0x619
+
+
 /* PP0 RAPL Domain */
 #define MSR_PP0_POWER_LIMIT   0x638
 #define MSR_PP0_ENERGY_STATUS 0x639
@@ -147,11 +151,6 @@ int init_rapl_read(void) {
     energy_units = pow(0.5, (double)((result >> 8) & 0x1f));
     time_units = pow(0.5, (double)((result >>16) & 0xf));
 
-    printf("Power units = %.3fW\n",power_units);
-    printf("Energy units = %.8fJ\n",energy_units);
-    printf("Time units = %.8fs\n",time_units);
-    printf("\n");
-
     return 0;
 }
 
@@ -160,6 +159,14 @@ double get_package_energy(void) {
         return -1;
 
     long long result = read_msr(fd, MSR_PKG_ENERGY_STATUS);
+    return (double) result * energy_units;
+}
+
+double get_dram_energy(void) {
+    if (fd == -1)
+        return -1;
+
+    long long result = read_msr(fd, MSR_DRAM_ENERGY_STATUS);
     return (double) result * energy_units;
 }
 

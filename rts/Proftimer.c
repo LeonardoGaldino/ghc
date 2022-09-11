@@ -80,7 +80,7 @@ handleProfTick(void)
 #ifdef PROFILING
     total_ticks++;
     if (do_prof_ticks) {
-        StgDouble current_energy = get_package_energy();
+        StgDouble current_energy = RtsFlags.ProfFlags.typeEnergyProfiling == ENERGY_PROFILING_DRAM ? get_dram_energy() : get_package_energy();
         StgDouble e_diff = total_ticks == 1 ? 0 : current_energy - last_energy;
         last_energy = current_energy;
 

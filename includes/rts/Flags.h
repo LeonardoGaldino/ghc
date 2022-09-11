@@ -138,7 +138,9 @@ typedef struct _PROFILING_FLAGS {
     char*               ccsSelector;
     char*               retainerSelector;
     char*               bioSelector;
-
+    nat                 typeEnergyProfiling;
+# define ENERGY_PROFILING_PKG   0
+# define ENERGY_PROFILING_DRAM  1
 } PROFILING_FLAGS;
 
 #define TRACE_NONE      0
