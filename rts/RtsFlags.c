@@ -1009,13 +1009,6 @@ error = rtsTrue;
                           RtsFlags.CcFlags.doCostCentres =
                               COST_CENTRES_SUMMARY;
                       }
-                      // for energy profiling: read package energy
-                      if (rts_argv[arg][2] == '\0' || rts_argv[arg][2] == 'p') {
-                          RtsFlags.ProfFlags.typeEnergyProfiling = ENERGY_PROFILING_PKG;
-                      } // for energy profiling: read memory dram energy
-                      else if (rts_argv[arg][2] == 'd') {
-                          RtsFlags.ProfFlags.typeEnergyProfiling = ENERGY_PROFILING_DRAM;
-                      }
                       break;
                 }
                 ) break;
