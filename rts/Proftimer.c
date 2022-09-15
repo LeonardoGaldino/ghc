@@ -72,7 +72,8 @@ initProfTimer( void )
 }
 
 nat total_ticks = 0;
-StgDouble last_energy = 0.0;
+StgDouble last_energy_pkg = 0.0;
+StgDouble last_energy_dram = 0.0;
 
 void
 handleProfTick(void)
@@ -80,9 +81,12 @@ handleProfTick(void)
 #ifdef PROFILING
     total_ticks++;
     if (do_prof_ticks) {
-        StgDouble current_energy = RtsFlags.ProfFlags.typeEnergyProfiling == ENERGY_PROFILING_DRAM ? get_dram_energy() : get_package_energy();
-        StgDouble e_diff = total_ticks == 1 ? 0 : current_energy - last_energy;
-        last_energy = current_energy;
+        StgDouble current_energy_pkg  = get_package_energy();
+        StgDouble current_energy_dram = get_dram_energy();
+        StgDouble e_diff_pkg = total_ticks == 1 ? 0 : current_energy_pkg - last_energy_pkg;
+        StgDouble e_diff_dram = total_ticks == 1 ? 0 : current_energy_dram - last_energy_dram;
+        last_energy_pkg = current_energy_pkg;
+        last_energy_dram = current_energy_dram;
 
         nat n;
         CostCentreStack *ccs, *prev_ccs;
@@ -97,7 +101,8 @@ handleProfTick(void)
             }
 
             prev_ccs = previous_ccs[n];
-            prev_ccs->e_counter += e_diff;
+            prev_ccs->e_counter_pkg += e_diff_pkg;
+            prev_ccs->e_counter_dram += e_diff_dram;
             previous_ccs[n] = ccs;
         }
     }

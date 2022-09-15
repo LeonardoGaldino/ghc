@@ -35,7 +35,8 @@ typedef struct CostCentre_ {
 
     // used for accumulating costs at the end of the run...
     StgWord64 mem_alloc;      // align 8 (Note [struct alignment])
-    StgDouble e_counter;      // align 8 (Note [struct alignment])
+    StgDouble e_counter_pkg;  // align 8 (Note [struct alignment])
+    StgDouble e_counter_dram; // align 8 (Note [struct alignment])
     StgWord   time_ticks;
 
     StgInt is_caf;            // non-zero for a CAF cost centre
@@ -60,7 +61,9 @@ typedef struct CostCentreStack_ {
                                 // profile? (zero if excluded via -hc
                                 // -hm etc.)
 
-    StgDouble  e_counter;       // energy consumed by this CCS
+    StgDouble  e_counter_pkg;   // energy consumed by this CCS proc socket
+
+    StgDouble  e_counter_dram;   // energy consumed by this CCS by DRAM
 
     StgWord    time_ticks;      // number of time ticks accumulated by
                                 // this CCS
@@ -72,9 +75,13 @@ typedef struct CostCentreStack_ {
                                 // (calculated at the end)
                                 // align 8 (Note [struct alignment])
 
-    StgDouble  inherited_energy; // sum of e_counter over all children
-                                 // (calculated at the end)
-                                 // align 8 (Note [struct alignment])
+    StgDouble  inherited_energy_pkg; // sum of e_counter_pkg over all children
+                                     // (calculated at the end)
+                                     // align 8 (Note [struct alignment])
+
+    StgDouble  inherited_energy_dram; // sum of e_counter_dram over all children
+                                      // (calculated at the end)
+                                      // align 8 (Note [struct alignment])
 
     StgWord    inherited_ticks; // sum of time_ticks over all children
                                 // (calculated at the end)
@@ -224,7 +231,8 @@ extern CostCentreStack * RTS_VAR(CCS_LIST);         // registered CCS list
             .module     = mod,                           \
             .srcloc     = loc,                           \
             .time_ticks = 0,                             \
-            .e_counter  = 0,                             \
+            .e_counter_pkg  = 0,                         \
+            .e_counter_dram = 0,                         \
             .mem_alloc  = 0,                             \
             .link       = 0,                             \
             .is_caf     = caf                            \
@@ -241,7 +249,8 @@ extern CostCentreStack * RTS_VAR(CCS_LIST);         // registered CCS list
             .selected            = 0,                    \
             .scc_count           = 0,                    \
             .time_ticks          = 0,                    \
-            .e_counter  = 0,                             \
+            .e_counter_pkg       = 0,                    \
+            .e_counter_dram      = 0,                    \
             .mem_alloc           = 0,                    \
             .inherited_ticks     = 0,                    \
             .inherited_alloc     = 0                     \
