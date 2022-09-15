@@ -708,7 +708,6 @@ static CostCentre *sorted_cc_list;
 static void
 aggregateCCCosts( CostCentreStack *ccs )
 {
-printf("a\n");
     IndexTable *i;
     ccs->cc->mem_alloc += ccs->mem_alloc;
     ccs->cc->time_ticks += ccs->time_ticks;
@@ -763,28 +762,21 @@ reportPerCCCosts( void )
     aggregateCCCosts(CCS_MAIN);
     sorted_cc_list = NULL;
 
- printf("1\n");
     max_label_len  = 11; // no shorter than the "COST CENTRE" header
     max_module_len = 7;  // no shorter than the "MODULE" header
 
     for (cc = CC_LIST; cc != NULL; cc = next) {
-        printf("x = %.2f/%.2f vs %.2f/%.2f \n", cc->e_counter_pkg, total_energy_pkg, cc->e_counter_dram, total_energy_dram);
-        printf("y = %lu/%lu vs %lu/%lu \n", cc->time_ticks, total_prof_ticks, cc->mem_alloc, total_alloc);
         next = cc->link;
         if (cc->time_ticks > total_prof_ticks/100
             || cc->mem_alloc > total_alloc/100
             || cc->e_counter_pkg > total_energy_pkg/100
             || cc->e_counter_dram > total_energy_dram/100
             || RtsFlags.CcFlags.doCostCentres >= COST_CENTRES_ALL) {
-            printf("b\n");
             insertCCInSortedList(cc);
-            printf("c\n");
             max_label_len = stg_max(strlen_utf8(cc->label), max_label_len);
             max_module_len = stg_max(strlen_utf8(cc->module), max_module_len);
-            printf("d\n");
         }
     }
-printf("2\n");
     fprintf(prof_file, "%-*s %-*s", max_label_len, "COST CENTRE", max_module_len, "MODULE");
     fprintf(prof_file, "%6s %6s %10s %11s", "%time", "%alloc", "%energy_pkg", "%energy_dram");
     if (RtsFlags.CcFlags.doCostCentres >= COST_CENTRES_VERBOSE) {
@@ -792,19 +784,17 @@ printf("2\n");
         fprintf(prof_file, "  %5s %9s", "ticks", "bytes");
     }
     fprintf(prof_file, "\n\n");
-printf("3\n");
     for (cc = sorted_cc_list; cc != NULL; cc = cc->link) {
         if (ignoreCC(cc)) {
             continue;
         }
-printf("4\n");
         fprintf(prof_file, "%s%*s %s%*s",
                 cc->label,
                 max_label_len - strlen_utf8(cc->label), "",
                 cc->module,
                 max_module_len - strlen_utf8(cc->module), "");
 
-        fprintf(prof_file, "%6.1f %6.1f %6.1f %6.1f",
+        fprintf(prof_file, "%6.1f %6.1f      %6.1f       %6.1f",
                 total_prof_ticks == 0 ? 0.0 : (cc->time_ticks / (StgFloat) total_prof_ticks * 100),
                 total_alloc == 0 ? 0.0 : (cc->mem_alloc / (StgFloat) total_alloc * 100),
                 total_energy_pkg == 0.0 ? 0.0 : (cc->e_counter_pkg / total_energy_pkg * 100),
@@ -885,7 +875,7 @@ reportCCSProfiling( void )
 
     fprintf(prof_file, "  (excludes profiling overheads)\n");
 
-    fprintf(prof_file, "\ttotal energy pkg = %11.2f joules\n\n", total_energy_pkg);
+    fprintf(prof_file, "\ttotal energy pkg = %11.2f joules\n", total_energy_pkg);
 
     fprintf(prof_file, "\ttotal energy dram = %11.2f joules\n\n", total_energy_dram);
 
@@ -920,7 +910,6 @@ logCCS(CostCentreStack *ccs, nat indent, nat max_label_len, nat max_module_len)
     IndexTable *i;
 
     cc = ccs->cc;
-printf("6\n");
     /* Only print cost centres with non 0 data ! */
 
     if (!ignoreCCS(ccs))
@@ -934,7 +923,7 @@ printf("6\n");
                 cc->module,
                 max_module_len - strlen_utf8(cc->module), "");
 
-        fprintf(prof_file, "%6ld %11" FMT_Word64 "  %5.1f  %5.1f %5.1f  %5.1f   %5.1f  %5.1f  %5.1f %5.1f",
+        fprintf(prof_file, "%6ld %11" FMT_Word64 "  %5.1f  %5.1f       %5.1f        %5.1f  %5.1f  %5.1f       %5.1f        %5.1f",
             ccs->ccsID, ccs->scc_count,
                 total_prof_ticks == 0 ? 0.0 : ((double)ccs->time_ticks / (double)total_prof_ticks * 100.0),
                 total_alloc == 0 ? 0.0 : ((double)ccs->mem_alloc / (double)total_alloc * 100.0),
@@ -945,7 +934,6 @@ printf("6\n");
                 total_energy_pkg == 0.0 ? 0.0 : (ccs->inherited_energy_pkg / total_energy_pkg * 100.0),
                 total_energy_dram == 0.0 ? 0.0 : (ccs->inherited_energy_dram / total_energy_dram * 100.0)
             );
-printf("7\n");
         if (RtsFlags.CcFlags.doCostCentres >= COST_CENTRES_VERBOSE) {
             // XXX: Add energy here
             fprintf(prof_file, "  %5" FMT_Word64 " %9" FMT_Word64,
