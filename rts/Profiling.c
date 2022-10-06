@@ -819,7 +819,7 @@ reportPerCCCosts( void )
 static void
 fprintHeader( nat max_label_len, nat max_module_len )
 {
-    fprintf(prof_file, "%-*s %-*s%6s %14s  %11s %9s %11s\n", max_label_len, "", max_module_len, "", "", "", "individual", "", "inherited");
+    fprintf(prof_file, "%-*s %-*s%6s %14s  %11s %25s %11s\n", max_label_len, "", max_module_len, "", "", "", "individual", "", "inherited");
 
     fprintf(prof_file, "%-*s %-*s", max_label_len, "COST CENTRE", max_module_len, "MODULE");
     fprintf(prof_file, "%6s %11s  %5s %5s %5s %5s  %5s %5s %5s %5s", "no.", "entries", "%time", "%alloc", "%energy_pkg", "%energy_dram", "%time", "%alloc", "%energy_pkg", "%energy_dram");
